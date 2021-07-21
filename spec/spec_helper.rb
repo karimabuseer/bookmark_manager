@@ -12,13 +12,20 @@
 # the additional setup, and require it from the spec files that actually need
 # it.
 #
+ENV['RACK_ENV'] = 'test'
 require 'capybara'
 require 'capybara/rspec'
-ENV['RACK_ENV'] = 'test'
 require_relative '../app.rb'
+require 'pg'
 Capybara.app = BookmarkManager
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 RSpec.configure do |config|
+  # opening test database
+  config.before(:each) do
+    ENV['RACK_ENV'] = 'test'
+    con = PG.connect :dbname => 'bookmark_manager_test'
+    con.exec("TRUNCATE TABLE bookmarks;")
+  end
   # rspec-expectations config goes here. You can use an alternate
   # assertion/expectation library such as wrong or the stdlib/minitest
   # assertions if you prefer.

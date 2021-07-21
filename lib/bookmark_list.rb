@@ -11,11 +11,13 @@ class BookmarkList
   end
 
   def list
-    con = PG.connect :dbname => 'bookmark_manager'
+
+    if ENV['RACK_ENV'] == 'test' 
+      con = PG.connect :dbname => 'bookmark_manager_test'
+      else 
+        con = PG.connect :dbname => 'bookmark_manager'
+    end
     dbbookmarks = con.exec "SELECT * FROM bookmarks;"
-    dbbookmarks.map {|row|
-      row['url']}.join("\n")
-
+    dbbookmarks.map {|row| row['url']}.join("\n")
   end
-
 end
