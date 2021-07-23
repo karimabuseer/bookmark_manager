@@ -3,19 +3,31 @@ require 'sinatra/reloader'
 require_relative './lib/bookmark_list.rb'
 
 class BookmarkManager < Sinatra::Base
+  enable :sessions, :method_override
   configure :development do
     register Sinatra::Reloader
-  end
-
-  before do
-    @bookmarklist = BookmarkList.instance
   end
 
   get '/' do
     erb(:index)
   end
 
-  get '/bookmark' do
-    erb(:bm) 
+  get '/bookmarks' do
+    @bookmarks = Bookmark.all
+    erb(:'bookmarks/index') 
+  end
+
+  get '/bookmarks/new' do
+    erb(:'bookmarks/new')
+  end
+
+  post '/bookmarks' do
+    Bookmark.create(title: params[:title], url: params[:url])
+    redirect to '/bookmarks'
+  end
+
+  delete '/bookmarks/:id' do
+    Bookmark.delete(id: params[:id])
+    redirect to '/bookmarks'
   end
 end
